@@ -83,12 +83,13 @@
 - http://localhost:8080/api/userinfo URL을 GET으로 호출하여 사용자 정보를 요청합니다.
 <img src="https://user-images.githubusercontent.com/61044774/91528741-025dbe00-e943-11ea-81af-2e4ca5a1d261.jpg" width="90%"></img>
   * 사용자는 인증요청에서 응답받은 JWT Token 값을 Authorization Header에 입력합니다.
-  * 서버는 API Request의 Header의 JWT Token을 확인하고 권한확인 및 접근제어를 수행합니다.
+  * 서버는 API Request Header의 JWT Token을 확인하고 권한확인 및 접근제어를 수행합니다.
 
 
 # 5. Spring Security 처리 과정
 - Spring Security config에서 인증(JwtAuthenticationFilter)과 접근제어(JwtAuthorizationFilter)에 대한 필터를 등록한다.
   ```java
+  
     @Override
     protected void configure(HttpSecurity http) throws Exception{
         http
@@ -122,9 +123,11 @@
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     	auth.authenticationProvider(authenticationProvider());
     }
+    
   ```
 - JwtAuthenticationFilter에서 UsernamePasswordAuthenticationToken을 생성하여 AuthenticaionManager에게 전달
   ```java
+  
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
     	UsernamePasswordAuthenticationToken authenticationToken;
@@ -144,6 +147,33 @@
         return this.getAuthenticationManager().authenticate(authenticationToken);
     }
 
+  ``` 
+- 인증을 위임받은 JwtAuthenticationProvider는 UserDetailsService를 통해 입력받은 아이디에 대한 사용자 정보를 DB에서 조회하여 인증을 수행함
+  ```java
+  
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
+        
+        String userID = (String) token.getPrincipal();
+        String password = (String) token.getCredentials();
+        UserDetails userDetails = (UserDetails) userDetailsService.loadUserByUsername(userID);
+
+        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+            throw new BadCredentialsException(userDetails.getUsername() + "Invalid password");
+        }
+
+        return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
+    }
+
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+    }
+    
+  ``` 
+- JwtAuthenticationFilter는 전달받은 UsernameAuthenticationToken을 재정의된 successfulAuthentication 메서드로 전송하고, JWT 토큰을 생성하여 Response 의 헤더에 추가하여 반환함
+  ```java
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
@@ -151,12 +181,40 @@
     	String token = jwtTokenProvider.createToken(principal);
         response.addHeader(AppCommon.getInstance().JWT_HEADER_STRING, AppCommon.getInstance().JWT_TOKEN_PREFIX + token);
     }
+    
   ``` 
-- 공지목록 조회 기능 (제목, 작성일, 작성자, 최종수정일, 내용)
-- 페이징 기능 (10개 마다)
-- 여러개의 첨부파일 등록 기능
+- JwtAuthorizationFilter에서 사용자가 API url을 요청 시 Request Header의 JWT Token을 확인하고 권한확인 및 접근제어를 수행합니다.
+  ```java
+  
+	@Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        String header = request.getHeader(AppCommon.getInstance().JWT_HEADER_STRING);
 
-**파일업로드 후 이미지가 안보일 수 있습니다. 그럴경우 아래와 같이 Project를 refresh 해주세요.**
+        if(header == null || !header.startsWith(AppCommon.getInstance().JWT_TOKEN_PREFIX)) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-<img src="https://user-images.githubusercontent.com/61044774/85596326-95008900-b684-11ea-9d44-ff2fd1bc166e.jpg" width="90%"></img>
+        Authentication authentication = getUsernamePasswordAuthentication(request);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        chain.doFilter(request, response);
+    }
+
+    private Authentication getUsernamePasswordAuthentication(HttpServletRequest request) {
+    	Authentication authentication = null;
+        String token = request.getHeader(AppCommon.getInstance().JWT_HEADER_STRING);
+        if(token != null) {
+        	Claims claims = jwtTokenProvider.getClaims(token.replace(AppCommon.getInstance().JWT_TOKEN_PREFIX, ""));
+        	
+            if(claims != null) {
+            	authentication = new UsernamePasswordAuthenticationToken(claims.get("name"), null, UserInfo.getAuthorities((String)claims.get("authRole")));
+            }
+        }
+        
+        return authentication;
+    }
+
+  ``` 
+
 

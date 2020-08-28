@@ -64,7 +64,7 @@
 
 # 4. 처리과정
 
-** 인증 요청
+## 인증 요청
 - http://localhost:8080/login URL로 POST로 인증정보를 전달합니다.
 <img src="https://user-images.githubusercontent.com/61044774/91527564-f670fc80-e940-11ea-85c7-142ad36b8841.jpg" width="90%"></img>
   * 사용자 계정은 admin / test 혹은 test / test로 지정할 수 있습니다. (admin은 ROLE_ADMIN 권한, test는 ROLE_MEMBER 권한)
@@ -79,8 +79,11 @@
 
 ---
 
-** 인증 요청
-
+## API 호출
+- http://localhost:8080/api/userinfo URL을 GET으로 호출하여 사용자 정보를 요청합니다.
+<img src="https://user-images.githubusercontent.com/61044774/91528741-025dbe00-e943-11ea-81af-2e4ca5a1d261.jpg" width="90%"></img>
+  * 사용자는 인증요청에서 응답받은 JWT Token을 Authorization Header에 입력합니다.
+  * 서버는 API Request의 Header의 JWT Token을 확인하고 권한확인 및 접근제어를 수행합니다.
 
 
 # 5. 구현기능

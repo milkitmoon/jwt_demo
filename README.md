@@ -3,7 +3,7 @@
 - 사용자는 아이디와 비밀번호를 통해 로그인을 요청하고 JWT 토큰을 전달받습니다.
 - 사용자는 JWT 토큰을 HTTP HEADER에 넣은 후 REST API를 호출합니다.
 - 서버는 HEADER에 있는 JWT 토큰을 Parsing하여 유효한 토큰인지 확인 후 인증을 허용해 줍니다.
-- 인터페이스는 REST 형식의 API로 제공됩니다.
+- 사용자의 권한에 따라 접근 가능한 URL이 제한됩니다.
 
 
 # 2. 기술명세
@@ -18,7 +18,7 @@
 
 > Swagger API명세 페이지 보기
 - 어플리케이션 기동 후 아래와 같이 [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) 접속하여 API페이지를 조회할 수 있습니다.
-<img src="https://user-images.githubusercontent.com/61044774/90470832-7a640100-e157-11ea-8122-ed5dc8e955e5.jpg" width="90%"></img>
+<img src="https://user-images.githubusercontent.com/61044774/91526280-35ea1980-e93e-11ea-9dc8-ed7792f53a37.jpg" width="90%"></img>
 
 
 > H2 database 웹콘솔 보기
@@ -59,17 +59,28 @@
 
 > 소스 main Application 실행하기 
 - com.milkit.app.DemoApplication 을 STS에서 run하여 바로 실행할 수 있습니다.
- <img src="https://user-images.githubusercontent.com/61044774/85557671-f44da180-b662-11ea-90cd-d25288cadf2f.jpg" width="90%"></img>
+ <img src="https://user-images.githubusercontent.com/61044774/91526490-b1e46180-e93e-11ea-9c03-6385d281d944.jpg" width="90%"></img>
 
 
-# 4. 로그인
+# 4. 처리과정
 
-> 웹접속경로는 다음과 같습니다. [http://localhost:8080/](http://localhost:8080/) 
+** 인증 요청
+- http://localhost:8080/login URL로 POST로 인증정보를 전달합니다.
+<img src="https://user-images.githubusercontent.com/61044774/91527564-f670fc80-e940-11ea-85c7-142ad36b8841.jpg" width="90%"></img>
+  * 사용자 계정은 admin / test 혹은 test / test로 지정할 수 있습니다. (admin은 ROLE_ADMIN 권한, test는 ROLE_MEMBER 권한)
+  * 사용자 계정은 POST Body에 다음과 같은 형식의 json 값을 설정한다
+  ```javascript
+  {
+	"username" : "admin",
+	"password" : "test"
+  }
+  ```
+  * 사용자가 인증되었다면 서버는 Response HEADER의 Authorization 의 값으로 JWT Token을 전달합니다. 
 
-- id : test
-- password : test
+---
 
-<img src="https://user-images.githubusercontent.com/61044774/85558776-0a0f9680-b664-11ea-9efd-e7fa8829266f.jpg" width="90%"></img>
+** 인증 요청
+
 
 
 # 5. 구현기능

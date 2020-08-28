@@ -2,7 +2,7 @@
 - 간단한 JWT 기반의 토큰방식 인증을 구현하였습니다.
 - 사용자는 아이디와 비밀번호를 통해 로그인을 요청하고 JWT 토큰을 전달받습니다.
 - 사용자는 JWT 토큰을 HTTP HEADER에 넣은 후 REST API를 호출합니다.
-- 서버는 HEADER에 있는 JWT 토큰을 Parsing하여 유효한 토큰인지 확인 후 인증을 허용해 줍니다.
+- 서버는 HEADER에 있는 JWT 토큰을 Parsing하여 유효한 토큰인지 확인 후 접근제어를 수행합니다.
 - 사용자의 권한에 따라 접근 가능한 URL이 제한됩니다. (ROLE_ADMIN, ROLE_MEMBER)
 
 

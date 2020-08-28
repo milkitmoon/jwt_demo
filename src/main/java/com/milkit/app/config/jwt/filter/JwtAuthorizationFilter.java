@@ -52,8 +52,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String token = request.getHeader(AppCommon.getInstance().JWT_HEADER_STRING);
         if(token != null) {
         	Claims claims = jwtTokenProvider.getClaims(token.replace(AppCommon.getInstance().JWT_TOKEN_PREFIX, ""));
-
-//log.debug(claims.toString());        	
         	
             if(claims != null) {
             	authentication = new UsernamePasswordAuthenticationToken(claims.get("name"), null, UserInfo.getAuthorities((String)claims.get("authRole")));

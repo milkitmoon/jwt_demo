@@ -3,7 +3,7 @@
 - 사용자는 아이디와 비밀번호를 통해 로그인을 요청하고 JWT 토큰을 전달받습니다.
 - 사용자는 JWT 토큰을 HTTP HEADER에 넣은 후 REST API를 호출합니다.
 - 서버는 HEADER에 있는 JWT 토큰을 Parsing하여 유효한 토큰인지 확인 후 인증을 허용해 줍니다.
-- 사용자의 권한에 따라 접근 가능한 URL이 제한됩니다.
+- 사용자의 권한에 따라 접근 가능한 URL이 제한됩니다. (ROLE_ADMIN, ROLE_MEMBER)
 
 
 # 2. 기술명세
@@ -14,9 +14,9 @@
 - JWT 인증 : spring security, jjwt
 - Persistence : JPA (Hibernate) 
 - Database : H2 (in memory)
-- OAS : Swagger
+- OAS : swagger
 
-> Swagger API명세 페이지 보기
+> swagger API명세 페이지 보기
 - 어플리케이션 기동 후 아래와 같이 [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) 접속하여 API페이지를 조회할 수 있습니다.
 <img src="https://user-images.githubusercontent.com/61044774/91526280-35ea1980-e93e-11ea-9dc8-ed7792f53a37.jpg" width="90%"></img>
 
@@ -82,13 +82,76 @@
 ## API 호출
 - http://localhost:8080/api/userinfo URL을 GET으로 호출하여 사용자 정보를 요청합니다.
 <img src="https://user-images.githubusercontent.com/61044774/91528741-025dbe00-e943-11ea-81af-2e4ca5a1d261.jpg" width="90%"></img>
-  * 사용자는 인증요청에서 응답받은 JWT Token을 Authorization Header에 입력합니다.
+  * 사용자는 인증요청에서 응답받은 JWT Token 값을 Authorization Header에 입력합니다.
   * 서버는 API Request의 Header의 JWT Token을 확인하고 권한확인 및 접근제어를 수행합니다.
 
 
-# 5. 구현기능
-> 구현기능
-- 공지 등록/수정/삭제기능
+# 5. Spring Security 처리 과정
+- Spring Security config에서 인증(JwtAuthenticationFilter)과 접근제어(JwtAuthorizationFilter)에 대한 필터를 등록한다.
+  ```java
+    @Override
+    protected void configure(HttpSecurity http) throws Exception{
+        http
+        	.httpBasic().disable() 
+	        .csrf().disable()
+	        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+	        .and()
+	        .authorizeRequests()
+	        .antMatchers(HttpMethod.POST, "/login").permitAll()
+	        .antMatchers("/api/greeting").hasAnyRole("MEMBER", "ADMIN")
+	        .antMatchers("/api/userinfo/**").hasRole("ADMIN")
+	        .anyRequest().authenticated()
+	        .and()
+	        .addFilterBefore(new JwtAuthorizationFilter(authenticationManager()), BasicAuthenticationFilter.class)
+	        .addFilterBefore(new JwtAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+	        ;
+        
+    }
+    
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+	
+    @Bean
+    public JwtAuthenticationProvider authenticationProvider() {
+        return new JwtAuthenticationProvider(passwordEncoder());
+    }
+    
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    	auth.authenticationProvider(authenticationProvider());
+    }
+  ```
+- JwtAuthenticationFilter에서 UsernamePasswordAuthenticationToken을 생성하여 AuthenticaionManager에게 전달
+  ```java
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+    	UsernamePasswordAuthenticationToken authenticationToken;
+    	
+		try {
+			UserInfo credentials = new ObjectMapper().readValue(request.getInputStream(), UserInfo.class);
+	        authenticationToken = new UsernamePasswordAuthenticationToken(
+	                credentials.getUsername(),
+	                credentials.getPassword(),
+	                new ArrayList<>()
+	        );
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new AttemptAuthenticationException();
+		}
+
+        return this.getAuthenticationManager().authenticate(authenticationToken);
+    }
+
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    	UserInfo principal = (UserInfo) authResult.getPrincipal();
+    	String token = jwtTokenProvider.createToken(principal);
+        response.addHeader(AppCommon.getInstance().JWT_HEADER_STRING, AppCommon.getInstance().JWT_TOKEN_PREFIX + token);
+    }
+  ``` 
 - 공지목록 조회 기능 (제목, 작성일, 작성자, 최종수정일, 내용)
 - 페이징 기능 (10개 마다)
 - 여러개의 첨부파일 등록 기능

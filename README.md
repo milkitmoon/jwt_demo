@@ -68,7 +68,7 @@
 - http://localhost:8080/login URL로 POST로 인증정보를 전달합니다.
 <img src="https://user-images.githubusercontent.com/61044774/91527564-f670fc80-e940-11ea-85c7-142ad36b8841.jpg" width="90%"></img>
   * 사용자 계정은 admin / test 혹은 test / test로 지정할 수 있습니다. (admin은 ROLE_ADMIN 권한, test는 ROLE_MEMBER 권한)
-  * 사용자 계정은 POST Body에 다음과 같은 형식의 json 값을 설정한다
+  * 사용자 계정은 POST Body에 다음과 같은 형식의 json 값을 설정합니다.
   ```javascript
   {
 	"username" : "admin",
@@ -87,7 +87,7 @@
 
 
 # 5. Spring Security 처리 과정
-- Spring Security config에서 인증(JwtAuthenticationFilter)과 접근제어(JwtAuthorizationFilter)에 대한 필터를 등록한다.
+- Spring Security config에서 인증(JwtAuthenticationFilter)과 접근제어(JwtAuthorizationFilter)에 대한 필터를 등록합니다.
   ```java
   
     @Override
@@ -125,7 +125,7 @@
     }
     
   ```
-- JwtAuthenticationFilter에서 UsernamePasswordAuthenticationToken을 생성하여 AuthenticaionManager에게 전달
+- JwtAuthenticationFilter에서 UsernamePasswordAuthenticationToken을 생성하여 AuthenticaionManager에게 전달합니다.
   ```java
   
     @Override
@@ -148,7 +148,7 @@
     }
 
   ``` 
-- 인증을 위임받은 JwtAuthenticationProvider는 UserDetailsService를 통해 입력받은 아이디에 대한 사용자 정보를 DB에서 조회하여 인증을 수행함
+- 인증을 위임받은 JwtAuthenticationProvider는 UserDetailsService를 통해 입력받은 아이디에 대한 사용자 정보를 DB에서 조회하여 인증을 수행합니다.
   ```java
   
     @Override
@@ -172,7 +172,7 @@
     }
     
   ``` 
-- JwtAuthenticationFilter는 전달받은 UsernameAuthenticationToken을 재정의된 successfulAuthentication 메서드로 전송하고, JWT 토큰을 생성하여 Response 의 헤더에 추가하여 반환함
+- JwtAuthenticationFilter는 전달받은 UsernameAuthenticationToken을 재정의된 successfulAuthentication 메서드로 전송하고, JWT 토큰을 생성하여 Response 의 헤더에 추가하여 반환합니다.
   ```java
 
     @Override

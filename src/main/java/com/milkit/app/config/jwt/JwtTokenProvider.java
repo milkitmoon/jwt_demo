@@ -48,8 +48,6 @@ public class JwtTokenProvider {
 	}
 	
 
-    
-	
 	public Map<String, String> createHeader(JwtDetails principal) {
     	String token = createAccessToken(principal);
     	String refreshToken = createRefreshToken(principal);
@@ -66,11 +64,6 @@ public class JwtTokenProvider {
     	String refreshToken = createRefreshToken(jwtDetails);
     	
     	return new JwtToken(token, refreshToken);
-    }
-
-    private Claims parseClaims(String token) {
-        return Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(AppCommon.getInstance().JWT_SECRETKEY))
-                .parseClaimsJws(token).getBody();
     }
     
     public Claims getClaims(String token) {
@@ -101,4 +94,11 @@ public class JwtTokenProvider {
 	
 		return (String) claims.get("name");
 	}
+	
+
+    private Claims parseClaims(String token) {
+        return Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(AppCommon.getInstance().JWT_SECRETKEY))
+                .parseClaimsJws(token).getBody();
+    }
+    
 }

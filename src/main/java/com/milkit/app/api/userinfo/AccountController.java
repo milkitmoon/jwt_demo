@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@Api(tags = "3. 계정정보 관리", value = "AccountController")
+@Api(tags = "3. 계정정보 관리 (ROLE_MEMBER, ROLE_ADMIN 접근가능)", value = "AccountController")
 public class AccountController extends AbstractApiController {
 
     @Autowired

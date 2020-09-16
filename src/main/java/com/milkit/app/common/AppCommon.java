@@ -23,8 +23,10 @@ public class AppCommon {
     }
 	
     public final String JWT_SECRETKEY = "jwt_demo";
-    public final long JWT_EXPIRATION_TIME = 864000000;
+    public final long JWT_EXPIRATION_TIME = 1800000;				// 30분
+    public final long JWT_REFRESH_EXPIRATION_TIME = 1209600000;		// 2주
     public final String JWT_TOKEN_PREFIX = "Bearer ";
     public final String JWT_HEADER_STRING = "Authorization";
+    public final String JWT_REFRESH_HEADER_STRING = "Refresh";
 	
 }

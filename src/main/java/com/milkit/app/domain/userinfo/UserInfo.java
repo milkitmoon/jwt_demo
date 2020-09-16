@@ -76,6 +76,7 @@ public class UserInfo implements UserDetails, JwtDetails {
     public UserInfo(String userID, String password) {
         this.userID = userID;
         this.password = password;
+        this.authRole = RoleEnum.MEMBER.getValue();
     }
     
     public UserInfo(Long id, String userID, String authRole) {
@@ -184,10 +185,10 @@ public class UserInfo implements UserDetails, JwtDetails {
 	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-        if(authRole.equals(Role.ADMIN.getValue())) {
-        	grantedAuthorities.add(new SimpleGrantedAuthority(Role.ADMIN.getValue()));
+        if(authRole.equals(RoleEnum.ADMIN.getValue())) {
+        	grantedAuthorities.add(new SimpleGrantedAuthority(RoleEnum.ADMIN.getValue()));
         } else {
-        	grantedAuthorities.add(new SimpleGrantedAuthority(Role.MEMBER.getValue()));
+        	grantedAuthorities.add(new SimpleGrantedAuthority(RoleEnum.MEMBER.getValue()));
         }
         
 		return grantedAuthorities;

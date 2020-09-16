@@ -1,19 +1,28 @@
 package com.milkit.app.domain.userinfo;
 
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 
-
+import com.milkit.app.api.userinfo.AccountController;
 import com.milkit.app.api.userinfo.UserInfoController;
+import com.milkit.app.common.AppCommon;
 import com.milkit.app.config.WebSecurityConfigure;
+import com.milkit.app.config.jwt.JwtToken;
+import com.milkit.app.config.jwt.JwtTokenProvider;
 import com.milkit.app.domain.userinfo.service.UserInfoServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -21,6 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,10 +45,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@WebMvcTest(UserInfoController.class) 
+
+@WebMvcTest(AccountController.class) 
 @Import(WebSecurityConfigure.class)
 @Slf4j
-public class UserInfoControllerTest {
+public class AccountControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -47,16 +58,24 @@ public class UserInfoControllerTest {
     @MockBean
     private UserInfoServiceImpl userInfoServie;
     
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
     
+  
     @Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
-    public void userinfoAll_테스트() throws Exception {
+    @WithMockUser(username = "test", roles = {"MEMBER"})
+    public void refresh_테스트() throws Exception {
+    	UserInfo userInfo = user();
+		String token = jwtTokenProvider.createRefreshToken(userInfo);
+		
         //given
-    	List<UserInfo> list = Arrays.asList(new UserInfo(1L, "admin", "ROLE_ADMIN"), new UserInfo(2L, "test", "ROLE_MEMBER"));
-        given(userInfoServie.selectAll()).willReturn(list);
+		JwtToken jwtToken = jwtTokenProvider.createBody(userInfo);
+        given(userInfoServie.refresh(token)).willReturn(jwtToken);
 
         //when
-        final ResultActions actions = mvc.perform(get("/api/userinfo")
+        final ResultActions actions = mvc.perform(get("/refresh")
+        		.header(AppCommon.getInstance().JWT_HEADER_STRING, AppCommon.getInstance().JWT_TOKEN_PREFIX + token)
+        		.accept("application/json;charset=UTF-8")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print());
 
@@ -65,16 +84,26 @@ public class UserInfoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("0"))
                 .andExpect(jsonPath("message").value("성공했습니다"))
-                .andExpect(jsonPath("value[0].id").value(1L))
-                .andExpect(jsonPath("value[0].userID").value("admin"))
-                .andExpect(jsonPath("value[0].authRole").value("ROLE_ADMIN"))
-                .andExpect(jsonPath("value[1].id").value(2L))
-                .andExpect(jsonPath("value[1].userID").value("test"))
-                .andExpect(jsonPath("value[1].authRole").value("ROLE_MEMBER"))
                 ;
     }
-    
  
+
+
+    
+    private UserInfo user() {
+		String password = "$2a$10$1rThoKu6Tt0osRcHVd98A.tiv0./T4tIUQwfRWN3bpkZFQFhf54tq";	//test
+		
+		UserInfo userInfo = new UserInfo("test", password);
+		userInfo.setUserNM("김복돌");
+		userInfo.setAuthRole("ROLE_MEMBER");
+		userInfo.setUseYN("Y");
+		userInfo.setInstTime(new Date());
+		userInfo.setUpdTime(new Date());
+		userInfo.setInstUser("admin");
+		userInfo.setUpdUser("admin");
+		
+		return userInfo;
+    }
     
     
 }

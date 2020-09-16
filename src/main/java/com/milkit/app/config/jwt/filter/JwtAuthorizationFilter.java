@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 import com.milkit.app.common.AppCommon;
 import com.milkit.app.config.jwt.JwtTokenProvider;
@@ -25,11 +26,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
+	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
 	
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
     	super(authenticationManager);
-        this.jwtTokenProvider = new JwtTokenProvider();
     }
 
 	@Override

@@ -13,7 +13,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import com.milkit.app.common.AppCommon;
 import com.milkit.app.common.exception.handler.ApiResponseEntityExceptionHandler;
+import com.milkit.app.config.jwt.JwtToken;
+import com.milkit.app.config.jwt.JwtTokenProvider;
 import com.milkit.app.domain.userinfo.UserInfo;
 import com.milkit.app.domain.userinfo.dao.UserInfoDao;
 
@@ -25,6 +28,9 @@ public class UserInfoServiceImpl implements UserDetailsService {
 
 	@Autowired
 	private UserInfoDao userInfoDao;
+	
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
 	public List<UserInfo> selectAll() throws Exception {
 		return userInfoDao.findAll();
@@ -35,7 +41,6 @@ public class UserInfoServiceImpl implements UserDetailsService {
 	
 	    Optional<UserInfo> optionalPost = userInfoDao.findById(id);
 	    if(optionalPost.isPresent()) {
-	
 	    	userInfo = optionalPost.get();
 	    }
 	
@@ -61,9 +66,13 @@ public class UserInfoServiceImpl implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String userID) throws UsernameNotFoundException {
-		UserInfo userInfo = select(userID);
+		return select(userID);
+	}
 
-        return userInfo;
+	public JwtToken refresh(String token) throws Exception {
+		String userID = jwtTokenProvider.getUsername(token.replace(AppCommon.getInstance().JWT_TOKEN_PREFIX, ""));
+		
+		return jwtTokenProvider.createBody( select(userID) );
 	}
     
 }

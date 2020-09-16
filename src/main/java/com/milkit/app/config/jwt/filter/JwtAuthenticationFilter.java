@@ -1,8 +1,10 @@
 package com.milkit.app.config.jwt.filter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -15,10 +17,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.milkit.app.common.AppCommon;
 import com.milkit.app.common.exception.AttemptAuthenticationException;
+import com.milkit.app.common.response.GenericResponse;
+import com.milkit.app.config.jwt.JwtToken;
 import com.milkit.app.config.jwt.JwtTokenProvider;
 import com.milkit.app.domain.userinfo.UserInfo;
 
@@ -26,15 +32,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+	@Autowired
     private JwtTokenProvider jwtTokenProvider;
-	
+
     
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
         super.setAuthenticationManager(authenticationManager);
-        this.jwtTokenProvider = new JwtTokenProvider();
     }
     
     @Override
@@ -60,7 +65,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
     	UserInfo principal = (UserInfo) authResult.getPrincipal();
-    	String token = jwtTokenProvider.createToken(principal);
-        response.addHeader(AppCommon.getInstance().JWT_HEADER_STRING, AppCommon.getInstance().JWT_TOKEN_PREFIX + token);
+    	
+//    	Map<String, String> header = jwtTokenProvider.createHeader(principal);
+//    	header.forEach((key, value) -> response.addHeader(key, value));
+    	
+    	writeAuthenticationBody(response, principal);
+    }
+    
+    private void writeAuthenticationBody(HttpServletResponse response, UserInfo principal) throws IOException {
+    	JwtToken jwtToken = jwtTokenProvider.createBody(principal);
+    	ObjectMapper objectMapper = new ObjectMapper();
+    	
+    	response.getWriter().write( objectMapper.writeValueAsString(new GenericResponse<JwtToken>((jwtToken))) );
     }
 }

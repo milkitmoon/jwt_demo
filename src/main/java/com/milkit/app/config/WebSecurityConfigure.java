@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import com.milkit.app.config.jwt.JwtTokenProvider;
 import com.milkit.app.config.jwt.filter.JwtAuthenticationFilter;
 import com.milkit.app.config.jwt.filter.JwtAuthenticationProvider;
 import com.milkit.app.config.jwt.filter.JwtAuthorizationFilter;
@@ -24,7 +25,6 @@ import com.milkit.app.config.jwt.filter.JwtAuthorizationFilter;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
-
 
 	@Override
     public void configure(WebSecurity web) throws Exception {
@@ -54,10 +54,25 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 	        .antMatchers("/api/userinfo/**").hasRole("ADMIN")
 	        .anyRequest().authenticated()
 	        .and()
-	        .addFilterBefore(new JwtAuthorizationFilter(authenticationManager()), BasicAuthenticationFilter.class)
-	        .addFilterBefore(new JwtAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+	        .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class)
+	        .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 	        ;
         
+    }
+    
+    @Bean
+    public JwtTokenProvider jwtTokenProvider() throws Exception {
+        return new JwtTokenProvider();
+    }
+    
+    @Bean
+    public JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
+        return new JwtAuthorizationFilter(authenticationManager());
+    }
+    
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
+        return new JwtAuthenticationFilter(authenticationManager());
     }
     
 	@Bean

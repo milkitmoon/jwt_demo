@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,18 +29,19 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@Api(tags = "2. 사용자 정보 (ROLE_ADMIN 접근가능)", value = "UserInfoController")
-public class UserInfoController extends AbstractApiController {
+@Api(tags = "3. 계정정보 관리", value = "AccountController")
+public class AccountController extends AbstractApiController {
 
     @Autowired
     private UserInfoServiceImpl userInfoService;
-
-    @GetMapping("/api/userinfo")
-    @ApiOperation(value = "사용자정보 전체조회 ", notes = "사용자정보 전체 목록을 조회한다.")
-    public ResponseEntity<GenericResponse<List<UserInfo>>> userinfo() throws Exception {
-        return apiResponse(() -> userInfoService.selectAll());
+    
+    
+    @GetMapping("/refresh")
+    @ApiOperation(value = "사용자토큰 재발급 ", notes = "사용자토큰 정보를 재발급한다.")
+    public ResponseEntity<GenericResponse<JwtToken>> refresh(
+    			@RequestHeader("Authorization") String token
+    		) throws Exception {
+        return apiResponse(() -> userInfoService.refresh(token));
     }
-
-
     
 }

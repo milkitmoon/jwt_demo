@@ -21,7 +21,7 @@ public class DataLoader implements ApplicationRunner {
     }
 
     public void run(ApplicationArguments args) {
-		String password = "$2a$10$1rThoKu6Tt0osRcHVd98A.tiv0./T4tIUQwfRWN3bpkZFQFhf54tq";
+		String password = "$2a$10$1rThoKu6Tt0osRcHVd98A.tiv0./T4tIUQwfRWN3bpkZFQFhf54tq";	//test
 		
 		UserInfo userInfo = new UserInfo("admin", password);
 		userInfo.setUserNM("관리자");

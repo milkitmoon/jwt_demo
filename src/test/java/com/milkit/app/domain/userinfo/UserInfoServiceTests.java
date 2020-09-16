@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.milkit.app.common.exception.handler.ApiResponseEntityExceptionHandler;
+import com.milkit.app.config.jwt.JwtToken;
+import com.milkit.app.config.jwt.JwtTokenProvider;
 import com.milkit.app.domain.userinfo.UserInfo;
 import com.milkit.app.domain.userinfo.service.UserInfoServiceImpl;
 
@@ -25,6 +27,9 @@ class UserInfoServiceTests {
 
 	@Autowired
     private UserInfoServiceImpl userInfoServie;
+	
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
 
 	@Test
@@ -54,6 +59,16 @@ class UserInfoServiceTests {
 		Long id = userInfoServie.insert(userInfo);
 		
 		assertTrue(id > 1L);
+	}
+	
+	@Test
+	public void 토큰refresh_테스트() throws Exception {
+		UserInfo userInfo = userInfoServie.select("test");
+		String token = jwtTokenProvider.createRefreshToken(userInfo);
+		
+		JwtToken jwtToken = userInfoServie.refresh(token);
+		
+		assertTrue(jwtToken.getRefreshToken() != null);
 	}
 
 }

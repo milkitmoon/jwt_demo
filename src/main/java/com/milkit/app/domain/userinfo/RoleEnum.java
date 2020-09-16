@@ -1,6 +1,6 @@
 package com.milkit.app.domain.userinfo;
 
-public enum Role {
+public enum RoleEnum {
 
     ADMIN("ROLE_ADMIN"),
     MEMBER("ROLE_MEMBER");
@@ -8,7 +8,7 @@ public enum Role {
     private String value;
     
 
-    Role(String value) {
+    RoleEnum(String value) {
 		this.value = value;
 	}
     

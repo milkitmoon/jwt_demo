@@ -30,7 +30,6 @@ public class SwaggerConfig {
 		return new Docket(DocumentationType.SWAGGER_2).useDefaultResponseMessages(false)
 				.select()
 				.apis(RequestHandlerSelectors.basePackage("com.milkit.app.api"))
-				.paths(PathSelectors.ant("/api/**"))
 				.build().directModelSubstitute(LocalDate.class, String.class)
 				.genericModelSubstitutes(ResponseEntity.class)
 				.ignoredParameterTypes(AuthenticationPrincipal.class)

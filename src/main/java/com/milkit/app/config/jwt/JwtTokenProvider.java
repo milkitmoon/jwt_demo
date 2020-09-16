@@ -26,21 +26,18 @@ public class JwtTokenProvider {
 	
     public JwtTokenProvider() {}
 
-	public String createToken(JwtDetails principal) {
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + AppCommon.getInstance().JWT_EXPIRATION_TIME);
-        
-		return Jwts.builder().setSubject(principal.getSubject())
-				  .setClaims(principal.getClaims())
-		          .setIssuedAt(now)
-		          .setExpiration(validity)
-		          .signWith(SignatureAlgorithm.HS256, AppCommon.getInstance().JWT_SECRETKEY)
-		          .compact();
+    
+	public String createAccessToken(JwtDetails principal) {
+		return createToken(principal, AppCommon.getInstance().JWT_EXPIRATION_TIME);
 	}
 	
 	public String createRefreshToken(JwtDetails principal) {
+        return createToken(principal, AppCommon.getInstance().JWT_REFRESH_EXPIRATION_TIME);
+	}
+	
+	private String createToken(JwtDetails principal, long expirationTime) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + AppCommon.getInstance().JWT_REFRESH_EXPIRATION_TIME);
+        Date validity = new Date(now.getTime() + expirationTime);
         
 		return Jwts.builder().setSubject(principal.getSubject())
 				  .setClaims(principal.getClaims())
@@ -49,10 +46,12 @@ public class JwtTokenProvider {
 		          .signWith(SignatureAlgorithm.HS256, AppCommon.getInstance().JWT_SECRETKEY)
 		          .compact();
 	}
+	
+
     
 	
 	public Map<String, String> createHeader(JwtDetails principal) {
-    	String token = createToken(principal);
+    	String token = createAccessToken(principal);
     	String refreshToken = createRefreshToken(principal);
     	
         Map<String, String> header = new HashMap<String, String>();
@@ -63,7 +62,7 @@ public class JwtTokenProvider {
     }
 
 	public JwtToken createBody(JwtDetails jwtDetails) throws JsonProcessingException {
-    	String token = createToken(jwtDetails);
+    	String token = createAccessToken(jwtDetails);
     	String refreshToken = createRefreshToken(jwtDetails);
     	
     	return new JwtToken(token, refreshToken);

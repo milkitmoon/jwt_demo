@@ -66,7 +66,7 @@
 
 ## 인증 요청
 - http://localhost:8080/login URL로 POST로 인증정보를 전달합니다.
-<img src="https://user-images.githubusercontent.com/61044774/91527564-f670fc80-e940-11ea-85c7-142ad36b8841.jpg" width="90%"></img>
+<img src="https://user-images.githubusercontent.com/61044774/93299272-c033e800-f82f-11ea-852d-9da348dfdf30.jpg" width="90%"></img>
   * 사용자 계정은 admin / test 혹은 test / test로 지정할 수 있습니다. (admin은 ROLE_ADMIN 권한, test는 ROLE_MEMBER 권한)
   * 사용자 계정은 POST Body에 다음과 같은 형식의 json 값을 설정합니다.
   ```javascript
@@ -75,8 +75,36 @@
 	"password" : "test"
   }
   ```
-  * 사용자가 인증되었다면 서버는 Response HEADER의 Authorization 의 값으로 JWT Token을 전달합니다. 
+  * 사용자가 인증되었다면 서버는 Response body에 JWT Token 정보를 전달합니다. 
+  ```javascript
+  {
+    "code": "0",
+    "message": "성공했습니다",
+    "value": {
+      "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyTk0iOiLqtIDrpqzsnpAiLCJhdXRoUm9sZSI6IlJPTEVfQURNSU4iLCJuYW1lIjoiYWRtaW4iLCJleHAiOjE2MDAyMzQxMjgsImlhdCI6MTYwMDIzMjMyOH0.hYTzcG5nDhdVn4OVbrrH7ybSLwBxq1Fm2O9A60uk8Zw",
+      "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyTk0iOiLqtIDrpqzsnpAiLCJhdXRoUm9sZSI6IlJPTEVfQURNSU4iLCJuYW1lIjoiYWRtaW4iLCJleHAiOjE2MDE0NDE5MzAsImlhdCI6MTYwMDIzMjMzMH0.MZLH17FUuUqYzlZDQ2AZDcRnSvxT2QJJeLHhiwtJFDo",
+      "tokenType": "bearer"
+    }
+  }
+  ```
+---
 
+## 토큰 재발급
+- http://localhost:8080/refresh URL로 토큰정보 재발급을 요청합니다.
+<img src="https://user-images.githubusercontent.com/61044774/93299989-f6be3280-f830-11ea-9873-0cd627d18072.jpg" width="90%"></img>
+  * 사용자는 인증요청에서 응답받은 JWT refresh Token 값을 Authorization Header에 입력합니다.
+  * 사용자의 토큰이 유효한 것인지 확인되었다면 서버는 Response body에 JWT Token 정보를 전달합니다. 
+  ```javascript
+  {
+    "code": "0",
+    "message": "성공했습니다",
+    "value": {
+      "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyTk0iOiLqtIDrpqzsnpAiLCJhdXRoUm9sZSI6IlJPTEVfQURNSU4iLCJuYW1lIjoiYWRtaW4iLCJleHAiOjE2MDAyMzkxODcsImlhdCI6MTYwMDIzNzM4N30.vp16ZPTySBEUJd3PxQd9ng3hnMBmOVoWrZksnXbw_5o",
+      "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyTk0iOiLqtIDrpqzsnpAiLCJhdXRoUm9sZSI6IlJPTEVfQURNSU4iLCJuYW1lIjoiYWRtaW4iLCJleHAiOjE2MDE0NDY5ODcsImlhdCI6MTYwMDIzNzM4N30.6XqQb6INp3IU-0IwHALG5lsIfC5PeUehekbQsKU2stE",
+      "tokenType": "bearer"
+    }
+  }
+  ```
 ---
 
 ## API 호출

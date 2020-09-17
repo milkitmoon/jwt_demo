@@ -1,4 +1,4 @@
-package com.milkit.app.config;
+package com.milkit.app.temp;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
 @Slf4j
-public class WebSecurityConfigureTest {
+public class TempTest {
 
     private PasswordEncoder passwordEncoder;
     

@@ -18,8 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice
 public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler(value = { RuntimeException.class })
-	protected ResponseEntity<Object> handleRuntimeException(RuntimeException ex, WebRequest request) {
+	@ExceptionHandler(value = { Exception.class })
+	protected ResponseEntity<Object> handleRuntimeException(Exception ex, WebRequest request) {
 		log.error(ex.getMessage(), ex);
 		
 		return handleExceptionInternal(ex, new GenericResponse(ErrorCode.SystemError, ex.getMessage()), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);

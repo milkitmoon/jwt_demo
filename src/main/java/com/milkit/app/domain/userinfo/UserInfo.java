@@ -31,7 +31,7 @@ import io.swagger.annotations.ApiModelProperty;
 public class UserInfo implements UserDetails, JwtDetails {
  
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="UserInfo의 키ID")
     private Long id;
     

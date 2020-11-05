@@ -39,6 +39,7 @@
 - **만약 lombok 관련 오류가 발생하면 아래의 url을 참조해 주세요**
 [https://stackoverflow.com/questions/35842751/lombok-not-working-with-sts](https://stackoverflow.com/questions/35842751/lombok-not-working-with-sts)
 [https://countryxide.tistory.com/16](https://countryxide.tistory.com/16)
+[https://planbsw.tistory.com/109](https://planbsw.tistory.com/109)
 
 ---
 

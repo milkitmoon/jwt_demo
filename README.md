@@ -33,10 +33,6 @@
 
 # 3. 빌드 및 실행
 
-> Tips 
-- 만약 빌드가 제대로 진행되지 않거나 오류가 발생 시 아래와 같이 STS에서 'Refresh Gradle Project' 를 클릭해 주세요
-<img src="https://user-images.githubusercontent.com/61044774/85550736-34f5ec80-b65c-11ea-865b-981c6b72f2b9.jpg" width="90%"></img>
-
 ---
 
 > Tips 

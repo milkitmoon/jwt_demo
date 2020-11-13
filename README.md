@@ -97,8 +97,13 @@
 ## API 호출
 - http://localhost:8080/api/userinfo URL을 GET으로 호출하여 사용자 정보를 요청합니다.
 <img src="https://user-images.githubusercontent.com/61044774/91528741-025dbe00-e943-11ea-81af-2e4ca5a1d261.jpg" width="90%"></img>
-  * 사용자는 인증요청에서 응답받은 JWT Token 값을 Authorization Header에 입력합니다.
-  * 서버는 API Request Header의 JWT Token을 확인하고 권한확인 및 접근제어를 수행합니다.
+
+  * <span style="color:red">사용자는 API 호출 시 상기 [인증요청] 에서 응답받은 JWT accessToken 값을 HTTP Header의 Authorization 항목에 입력하여 전송하여야 합니다.</span>  
+    ex) Request HEADER의 Authorization 값 형식
+    ```html
+    Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyTk0iOiLqtIDrpqzsnpAiLCJhdXRoUm9sZSI6IlJPTEVfQURNSU4iLCJuYW1lIjoiYWRtaW4iLCJleHAiOjE2MDAyMzQxMjgsImlhdCI6MTYwMDIzMjMyOH0.hYTzcG5nDhdVn4OVbrrH7ybSLwBxq1Fm2O9A60uk8Zw
+    ```
+  * <span style="color:blue">서버는 API Request Header의 JWT Token을 확인하고 권한확인 및 접근제어를 수행합니다.</span>
 
 
 # 5. Spring Security 처리 과정
